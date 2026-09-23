@@ -19,14 +19,14 @@ jobs:
         uses: openai/codex-action@v1
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }} #（1）
-        prompt: | # （2）
-                    このPull Requestの差分をレビューしてください。
-                    ベースブランチ: ${{ github.base_ref }}
-                    重要度の高い指摘から順に、Markdown形式で日本語で出力してください。
-        permission-profile: ":read-only" #（3） 
-        output-file: codex-review.md #（4）
+          prompt: | # （2）
+            このPull Requestの差分をレビューしてください。
+            ベースブランチ: ${{ github.base_ref }}
+            重要度の高い指摘から順に、Markdown形式で日本語で出力してください。
+          permission-profile: ":read-only" #（3）
+          output-file: codex-review.md #（4）
 
-      - name:レビュー結果をPRにコメントとして投稿
+      - name: レビュー結果をPRにコメントとして投稿
         uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ github.event.pull_request.number }}
