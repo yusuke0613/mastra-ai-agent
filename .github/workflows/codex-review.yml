@@ -1,0 +1,33 @@
+name: Codex PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write #（5）
+      pull-requests: write #（6）
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Codexでレビュー
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }} #（1）
+        prompt: | # （2）
+                    このPull Requestの差分をレビューしてください。
+                    ベースブランチ: ${{ github.base_ref }}
+                    重要度の高い指摘から順に、Markdown形式で日本語で出力してください。
+        permission-profile: ":read-only" #（3） 
+        output-file: codex-review.md #（4）
+
+      - name:レビュー結果をPRにコメントとして投稿
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-path: codex-review.md
